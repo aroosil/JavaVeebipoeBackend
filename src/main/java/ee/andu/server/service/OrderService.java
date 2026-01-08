@@ -71,7 +71,7 @@ public class OrderService {
         body.setTimestamp(ZonedDateTime.now().toString());
         body.setAmount(total);
         body.setOrder_reference("asdafd" + orderId);
-        body.setCustomer_url("https://err.ee");
+        body.setCustomer_url("https://veebipood-frontend.web.app/");
         body.setApi_username("e36eb40f5ec87fa2");
 
         HttpHeaders headers = new HttpHeaders();
