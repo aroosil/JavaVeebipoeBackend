@@ -4,10 +4,7 @@ import ee.andu.server.entity.Order;
 import ee.andu.server.entity.PaymentState;
 import ee.andu.server.entity.Person;
 import ee.andu.server.entity.Product;
-import ee.andu.server.model.EveryPayBody;
-import ee.andu.server.model.EveryPayResponse;
-import ee.andu.server.model.ParcelMachine;
-import ee.andu.server.model.PaymentLink;
+import ee.andu.server.model.*;
 import ee.andu.server.repository.OrderRepository;
 import ee.andu.server.repository.PersonRepository;
 import ee.andu.server.repository.ProductRepository;
@@ -61,8 +58,9 @@ public class OrderService {
 
         return orderRepository.save(order);
     }
-
-    public PaymentLink makePayment(Long orderId, double total) {
+    // success: order_reference=asdafd20&payment_reference=701d9f3bc2b86896b48b00f2eb9387c4e1f97204d77b269c6f8a3e2ae6927d05
+    // fail: order_reference=asdafd21&payment_reference=1ac71a45979b5b5b48c72d4f06f960b1b328fd37650895780143eec5a6f35432
+    public PaymentLink makePayment(Long order_reference, double total) {
         String url = "https://igw-demo.every-pay.com/api/v4/payments/oneoff";
 
         EveryPayBody body = new EveryPayBody();
@@ -70,8 +68,8 @@ public class OrderService {
         body.setNonce("bla" + ZonedDateTime.now() + UUID.randomUUID());
         body.setTimestamp(ZonedDateTime.now().toString());
         body.setAmount(total);
-        body.setOrder_reference("asdafd" + orderId);
-        body.setCustomer_url("https://veebipood-frontend.web.app/");
+        body.setOrder_reference("asdafd" + order_reference);
+        body.setCustomer_url("https://err.ee");//"https://veebipood-frontend.web.app/");
         body.setApi_username("e36eb40f5ec87fa2");
 
         HttpHeaders headers = new HttpHeaders();
@@ -99,5 +97,37 @@ public class OrderService {
             throw new RuntimeException("Could not get parcel machines");
         }
         return Arrays.stream(body).filter(e -> e.getA0_name().equals("EE")).toList();
+    }
+
+    public OrderPaid checkPayment(String orderReference, String paymentReference) {
+        String debug_username = "e36eb40f5ec87fa2";
+
+        String url = "https://igw-demo.every-pay.com/api/v4/payments/" + paymentReference + "?api_username=" + debug_username + "&detailed=false";
+//        String url = "https://igw-demo.every-pay.com/api/v4/payments/701d9f3bc2b86896b48b00f2eb9387c4e1f97204d77b269c6f8a3e2ae6927d05?api_username=e36eb40f5ec87fa2&detailed=false";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth(debug_username, "7b91a3b9e1b74524c2e9fc282f8ac8cd");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<EveryPayBody> entity = new HttpEntity<>(null, headers);
+
+        EveryPayStatus response = restTemplate.exchange(url,  HttpMethod.GET, entity, EveryPayStatus.class).getBody();
+
+        if (response == null ) {
+            throw new RuntimeException("Could not get payment status");
+        }
+        if (!response.getOrder_reference().equals(orderReference)) {
+            throw new RuntimeException("Order reference does not match");
+        }
+
+        PaymentState paymentState = (PaymentState.valueOf(response.getPayment_state().toUpperCase()));
+
+        String order_id = response.getOrder_reference().replace("asdafd", "");
+        Order order = orderRepository.findById(Long.parseLong(order_id)).orElseThrow();
+        order.setPaymentState(paymentState);
+
+        OrderPaid orderPaid = new OrderPaid();
+        orderPaid.setPaid(paymentState.equals(PaymentState.SETTLED));
+        return orderPaid;
     }
 }

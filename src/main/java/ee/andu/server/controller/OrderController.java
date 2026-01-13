@@ -2,7 +2,7 @@ package ee.andu.server.controller;
 
 import ee.andu.server.entity.Order;
 import ee.andu.server.entity.Product;
-import ee.andu.server.model.EveryPayResponse;
+import ee.andu.server.model.OrderPaid;
 import ee.andu.server.model.ParcelMachine;
 import ee.andu.server.model.PaymentLink;
 import ee.andu.server.repository.OrderRepository;
@@ -50,6 +50,11 @@ public class OrderController {
     @GetMapping("parcel-machines")
     public List<ParcelMachine> getParcelMachines() {
         return orderService.getParcelMachines();
+    }
+
+    @GetMapping("check-payment")
+    public OrderPaid checkPayment(@RequestParam String order_reference, @RequestParam String payment_reference) {
+        return orderService.checkPayment(order_reference, payment_reference);
     }
 
 //    @GetMapping("payment")
