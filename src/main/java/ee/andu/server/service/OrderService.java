@@ -79,7 +79,7 @@ public class OrderService {
         body.setAmount(total);
         body.setOrder_reference(prefix + order_reference);
 
-        body.setCustomer_url(customerURL+ "/payment");
+        body.setCustomer_url(customerURL + "/payment");
         body.setApi_username("e36eb40f5ec87fa2"); // TODO: saab kui teha kasutaja antud firmale, kes lehte haldab
 
         HttpHeaders headers = new HttpHeaders();
@@ -112,7 +112,7 @@ public class OrderService {
     public OrderPaid checkPayment(String orderReference, String paymentReference) {
         String debug_username = "e36eb40f5ec87fa2";
 
-        String requestUrl = baseUrl + "/" + paymentReference + "?api_username=" + debug_username + "&detailed=false";
+        String requestUrl = baseUrl + "/payments/" + paymentReference + "?api_username=" + debug_username + "&detailed=false";
 //        String url = "https://igw-demo.every-pay.com/api/v4/payments/701d9f3bc2b86896b48b00f2eb9387c4e1f97204d77b269c6f8a3e2ae6927d05?api_username=e36eb40f5ec87fa2&detailed=false";
 
         HttpHeaders headers = new HttpHeaders();
