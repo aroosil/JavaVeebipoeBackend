@@ -79,7 +79,7 @@ public class OrderService {
         body.setAmount(total);
         body.setOrder_reference(prefix + order_reference);
 
-        body.setCustomer_url(customerURL);
+        body.setCustomer_url(customerURL+ "/payment");
         body.setApi_username("e36eb40f5ec87fa2"); // TODO: saab kui teha kasutaja antud firmale, kes lehte haldab
 
         HttpHeaders headers = new HttpHeaders();
