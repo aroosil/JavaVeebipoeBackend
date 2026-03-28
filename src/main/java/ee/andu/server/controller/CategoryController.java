@@ -11,8 +11,6 @@ import java.util.List;
 
 @Log4j2
 @RestController
-@CrossOrigin(origins = "*")
-//@CrossOrigin(origins = "http://localhost:5173")
 public class CategoryController {
 
     @Autowired

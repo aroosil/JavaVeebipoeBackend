@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order,Long> {
     List<Order> findAllByCreatedBetween(Date startDate, Date endDate);
+
+    List<Order> findByPerson_Id(Long id);
 }

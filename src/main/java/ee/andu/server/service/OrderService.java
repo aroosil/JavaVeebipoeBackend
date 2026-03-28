@@ -43,7 +43,9 @@ public class OrderService {
     @Value("${everypay.customerURL}")
     private String customerURL;
 
-    private String prefix = "asdafd";
+    private final String everypay_username = "e36eb40f5ec87fa2";
+    private final String everypay_password = "7b91a3b9e1b74524c2e9fc282f8ac8cd";
+    private final String prefix = "asdafdd";
 
     public double calculateCartSum(List<Product> products) {
         double sum = 0;
@@ -80,10 +82,10 @@ public class OrderService {
         body.setOrder_reference(prefix + order_reference);
 
         body.setCustomer_url(customerURL + "/payment");
-        body.setApi_username("e36eb40f5ec87fa2"); // TODO: saab kui teha kasutaja antud firmale, kes lehte haldab
+        body.setApi_username(everypay_username); // TODO: saab kui teha kasutaja antud firmale, kes lehte haldab
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth("e36eb40f5ec87fa2", "7b91a3b9e1b74524c2e9fc282f8ac8cd");
+        headers.setBasicAuth(everypay_username, everypay_password);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<EveryPayBody> entity = new HttpEntity<>(body, headers);
@@ -110,13 +112,12 @@ public class OrderService {
     }
 
     public OrderPaid checkPayment(String orderReference, String paymentReference) {
-        String debug_username = "e36eb40f5ec87fa2";
 
-        String requestUrl = baseUrl + "/payments/" + paymentReference + "?api_username=" + debug_username + "&detailed=false";
+        String requestUrl = baseUrl + "/payments/" + paymentReference + "?api_username=" + everypay_username + "&detailed=false";
 //        String url = "https://igw-demo.every-pay.com/api/v4/payments/701d9f3bc2b86896b48b00f2eb9387c4e1f97204d77b269c6f8a3e2ae6927d05?api_username=e36eb40f5ec87fa2&detailed=false";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(debug_username, "7b91a3b9e1b74524c2e9fc282f8ac8cd");
+        headers.setBasicAuth(everypay_username, everypay_password);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<EveryPayBody> entity = new HttpEntity<>(null, headers);
@@ -135,6 +136,7 @@ public class OrderService {
         String order_id = response.getOrder_reference().replace(prefix, "");
         Order order = orderRepository.findById(Long.parseLong(order_id)).orElseThrow();
         order.setPaymentState(paymentState);
+        orderRepository.save(order);
 
         OrderPaid orderPaid = new OrderPaid();
         orderPaid.setPaid(paymentState.equals(PaymentState.SETTLED));

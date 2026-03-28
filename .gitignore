@@ -5,7 +5,7 @@ target/
 !**/src/test/**/target/
 
 frontend
-logs.log
+logs.log*
 
 ### STS ###
 .apt_generated

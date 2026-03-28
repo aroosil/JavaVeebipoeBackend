@@ -14,8 +14,6 @@ import java.util.List;
 //import org.springframework.web.bind.annotation.RequestMethod;
 
 @RestController
-@CrossOrigin(origins = "*")
-//@CrossOrigin(origins = "http://localhost:5173")
 public class ProductController {
 
     @Autowired
